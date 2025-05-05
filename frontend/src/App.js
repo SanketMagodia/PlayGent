@@ -6,6 +6,7 @@ import Library from "./components/Library";
 import Emulator from "./components/Emulator";
 import { GbaProvider } from "react-gbajs";
 import { ThemeProvider } from "./ThemeContext";
+import AppFooter from "./components/footer";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             }
           />
         </Routes>
+        <AppFooter />
       </Router>
     </ThemeProvider>
   );

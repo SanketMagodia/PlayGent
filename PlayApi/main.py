@@ -1,8 +1,8 @@
 import os
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-
+from typing import List, Optional
 # --- Configuration ---
 ROMS_DIRECTORY = "roms" # Directory where your .gba files are stored
 # --- ---
@@ -29,7 +29,7 @@ app.add_middleware(
 # --- ---
 
 # --- Helper Function ---
-def get_available_roms():
+def get_available_roms() -> List[str]:
     """Scans the ROMS_DIRECTORY for .gba files."""
     rom_files = []
     if not os.path.isdir(ROMS_DIRECTORY):
@@ -43,14 +43,32 @@ def get_available_roms():
         print(f"Error scanning ROMs directory: {e}")
         return []
     return rom_files
-# --- ---
 
-# --- API Endpoints ---
 @app.get("/api/games")
-async def list_games():
-    """Returns a list of available GBA game filenames."""
+def list_games(
+    q: Optional[str] = Query(None, description="Search query"),
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(24, ge=1, le=100, description="Games per page"),
+):
+    """
+    Returns a paginated, optionally filtered list of GBA game filenames.
+    """
     games = get_available_roms()
-    return {"games": games}
+    # Apply search filter if present
+    if q:
+        games = [g for g in games if q.lower() in g.lower()]
+    total = len(games)
+    start = (page - 1) * per_page
+    end = start + per_page
+    games_page = games[start:end]
+    pages = (total + per_page - 1) // per_page
+    return JSONResponse({
+        "games": games_page,
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "pages": pages,
+    })
 
 @app.get("/api/roms/{game_name}")
 async def get_rom(game_name: str):
