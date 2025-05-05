@@ -1,0 +1,11 @@
+[project]
+name = "playapi"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.12",
+    "python-multipart>=0.0.20",
+    "uvicorn>=0.34.2",
+]
