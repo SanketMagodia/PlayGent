@@ -15,7 +15,7 @@ const FullScreenLoading = () => {
       zIndex: 1000,
     }}>
       <img src={gif} alt="Loading..." style={{ maxWidth: 'auto', height: 'auto' }} />
-      <h1 style={{ color: 'white' }}>LOADING</h1>
+      {/* <h1 style={{ color: 'white' }}>LOADING</h1> */}
     </div>
   );
 };
