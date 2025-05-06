@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:8000/api";
+const API_URL = "https://readquest.onrender.com/api";
+//"http://localhost:8000/api";
+//"https://readquest.onrender.com/api";
 
 // export async function fetchGames() {
 //   const res = await fetch(`${API_URL}/games`);

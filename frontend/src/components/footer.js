@@ -66,7 +66,7 @@ export default function AppFooter() {
             color: theme?.gbaAccent || "#67e8f9"
           }}>Contact</div>
           <div style={{ marginBottom: 8 }}>
-            <a href="mailto:contact@playgent.app" style={{
+            <a href="mailto:magodiasanket@gmail.com" style={{
               ...footerLink(dark), fontWeight: 600
             }}>
               <FaEnvelope style={iconStyle} /> magodiasanket@gmail.com
@@ -104,6 +104,7 @@ const footerLink = (dark) => ({
   opacity: 0.92,
   fontWeight: 500,
 });
+
 const footerIconLink = (theme) => ({
   color: theme?.gbaAccent || "#67e8f9",
   fontSize: 22,

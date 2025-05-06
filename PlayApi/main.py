@@ -92,7 +92,6 @@ async def get_rom(game_name: str):
         path=file_path,
         media_type='application/octet-stream',
         filename=game_name,
-        headers={'Access-Control-Allow-Origin': 'http://localhost:3000'}
     )
     return response
 # --- ---
