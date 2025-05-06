@@ -7,7 +7,8 @@ import { FaGamepad } from "react-icons/fa";
 import { useTheme } from "../ThemeContext";
 import { fetchGames } from "../api/games"; // Adjust the import path as necessary
 import GameCard from "./GameCard";
-const PER_PAGE = 24;
+import FullScreenLoading from "../loadingScreen"
+const PER_PAGE = 12;
 
 export default function Library() {
   const [games, setGames] = useState([]);
@@ -23,7 +24,15 @@ export default function Library() {
 
   useEffect(() => {
     setLoading(true);
-    fetchGames({ q, page, per_page: PER_PAGE }).then(data => {
+    
+    // Add a minimum delay of 2 seconds
+    const minDelay = new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Fetch games data
+    const fetchData = fetchGames({ q, page, per_page: PER_PAGE });
+    
+    // Wait for both the delay and data fetch to complete
+    Promise.all([minDelay, fetchData]).then(([_, data]) => {
       setGames(data.games);
       setTotal(data.total);
       setPages(data.pages);
@@ -42,31 +51,7 @@ export default function Library() {
   };
 
   if (loading) return (
-    <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div className="lds-dual-ring" />
-      <style>{`
-        .lds-dual-ring {
-          display: inline-block;
-          width: 64px;
-          height: 64px;
-        }
-        .lds-dual-ring:after {
-          content: " ";
-          display: block;
-          width: 46px;
-          height: 46px;
-          margin: 1px;
-          border-radius: 50%;
-          border: 6px solid #ff7e1b;
-          border-color: #ff7e1b transparent #ff7e1b transparent;
-          animation: lds-dual-ring 1.2s linear infinite;
-        }
-        @keyframes lds-dual-ring {
-          0% { transform: rotate(0deg);}
-          100% { transform: rotate(360deg);}
-        }
-      `}</style>
-    </div>
+    <FullScreenLoading />
   );
 
   return (
@@ -79,7 +64,7 @@ export default function Library() {
       <h2 style={{
         fontSize: "clamp(1.5rem, 5vw, 2.2rem)",
         fontWeight: 800,
-        color: dark ? " #ff7e1b" : " #c2410c",
+        color:  " #c2410c",
         marginBottom: 18,
         letterSpacing: 1,
         textShadow: dark ? "0 2px 8px #0008" : "0 2px 8px #fff8"
@@ -139,10 +124,36 @@ export default function Library() {
       {/* Game Grid */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))",
         gap: 22,
-        marginBottom: 28
+        marginBottom: 28,
+        width: "100%",
+        justifyItems: "center", // Center items horizontally
+        justifyContent: "center", // Center the entire grid
+        gridAutoRows: "1fr", // Make all rows the same height
       }}>
+        <style>{`
+          @media (min-width: 1100px) {
+            .game-grid {
+              grid-template-columns: repeat(4, 250px); /* Force 4 columns on wide screens */
+            }
+          }
+          @media (min-width: 800px) and (max-width: 1099px) {
+            .game-grid {
+              grid-template-columns: repeat(3, 250px); /* 3 columns on medium screens */
+            }
+          }
+          @media (min-width: 500px) and (max-width: 799px) {
+            .game-grid {
+              grid-template-columns: repeat(2, 250px); /* 2 columns on smaller screens */
+            }
+          }
+          @media (max-width: 499px) {
+            .game-grid {
+              grid-template-columns: repeat(1, 250px); /* 1 column on mobile */
+            }
+          }
+        `}</style>
         {games.length === 0 ? (
           <div style={{
             gridColumn: "1 / -1",
@@ -209,6 +220,7 @@ export default function Library() {
       <div style={{
         textAlign: "center",
         marginTop: 10,
+        marginBottom: 20,
         color: dark ? "#fff" : "#c2410c",
         fontSize: 14,
         opacity: 0.7
@@ -221,10 +233,5 @@ export default function Library() {
 
 
 
-function stringToColor(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  return `hsl(${hash % 360},70%,60%)`;
-}
 
 

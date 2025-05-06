@@ -22,11 +22,25 @@ export default function Emulator() {
   const uploadInputRef = useRef();
 
   // Responsive scaling based on container width, keeping 3:2 aspect ratio
+  // Responsive scaling based on container width, keeping 3:2 aspect ratio
   useEffect(() => {
     function handleResize() {
       if (canvasContainerRef.current) {
-        const width = canvasContainerRef.current.offsetWidth;
-        setScale(width / 240); // 240 is native GBA width
+        const container = canvasContainerRef.current;
+        const maxWidth = window.innerWidth * 0.7; // 70% of viewport width
+        const containerWidth = window.innerWidth > 700 ? 
+          Math.min(container.offsetWidth, maxWidth) : 
+          container.offsetWidth; // 100% width on mobile
+        
+        // Calculate height based on 3:2 aspect ratio
+        const containerHeight = containerWidth / 1.5;
+        
+        // Calculate scale based on GBA's native resolution (240x160)
+        const widthScale = containerWidth / 240;
+        const heightScale = containerHeight / 160;
+        
+        // Use the smaller scale to prevent distortion
+        setScale(Math.min(widthScale, heightScale));
       }
     }
     window.addEventListener("resize", handleResize);
@@ -137,14 +151,14 @@ export default function Emulator() {
     >
       {/* Responsive styles for canvas container */}
       <style>{`
-        @media (max-width: 700px) {
-          .gba-canvas-container {
-            width: 98vw !important;
-            min-width: 0 !important;
-            max-width: 100vw !important;
-          }
-        }
-      `}</style>
+  @media (max-width: 700px) {
+    .gba-canvas-container {
+      width: 100% !important;
+      min-width: 240px !important;
+      max-width: 100% !important;
+    }
+  }
+`}</style>
 
       <h2
         style={{
@@ -162,13 +176,13 @@ export default function Emulator() {
 
       <div
         style={{
-          margin: "32px 0 16px 0",
+          margin: "0px 0 16px 0",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           position: "relative",
           width: "100%",
-          maxWidth: 600,
+          maxWidth: 900, // Increased from 600 to allow wider game screen
         }}
       >
         {/* Emulator Display */}
@@ -201,32 +215,41 @@ export default function Emulator() {
             </div>
           )}
           <div
-            ref={canvasContainerRef}
-            className="gba-canvas-container"
-            style={{
-              width: "75vw",
-              maxWidth: 900,
-              minWidth: 240,
-              aspectRatio: "3 / 2",
-              background: "#222",
-              borderRadius: 12,
-              overflow: "hidden",
-              border: "2px solid #333",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto",
-              transition: "width 0.3s"
-            }}
-          >
-            <ReactGbaJs
-              scale={scale}
-              volume={1}
-              key={gameName}
-              style={{ display: loading ? "none" : "block" }}
-              canvasProps={{ id: "gba-canvas", tabIndex: 0 }}
-            />
-          </div>
+  ref={canvasContainerRef}
+  className="gba-canvas-container"
+  style={{
+    width: "70%", // Default to 70% width
+    height: "auto", // Height will be determined by aspect ratio
+    aspectRatio: "3 / 2",
+    background: "#222",
+    borderRadius: 12,
+    overflow: "hidden",
+    border: "2px solid #333",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto",
+    transition: "all 0.3s"
+  }}
+>
+  <ReactGbaJs
+    scale={scale}
+    volume={1}
+    key={gameName}
+    style={{ 
+      display: loading ? "none" : "block",
+      width: "100%",
+      height: "100%",
+      imageRendering: "pixelated",
+      objectFit: "contain"
+    }}
+    canvasProps={{ 
+      id: "gba-canvas", 
+      tabIndex: 0,
+      style: { width: '100%', height: '100%' }
+    }}
+  />
+</div>
         </div>
 
         {/* Mobile Controls below emulator */}

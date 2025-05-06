@@ -122,8 +122,9 @@ export default function MobileControls() {
       gap: 18,
       pointerEvents: "auto",
       zIndex: 10,
-      padding: "0 12px 40px 12px",
-      position: "relative"
+      padding: "10px 12px 40px 12px",
+      position: "relative",
+      marginTop: 100,
     }}>
       {/* D-Pad */}
       <div style={{

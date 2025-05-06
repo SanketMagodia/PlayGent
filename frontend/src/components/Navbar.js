@@ -171,7 +171,21 @@ export default function Navbar() {
   const styles = getNavbarStyles(theme, dark);
 
   useEffect(() => { setIsOpen(false); }, [location]);
-  useEffect(() => { /* ... body scroll lock same as before ... */ }, [isOpen]);
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = `-${window.scrollY}px`;
+    } else {
+      const scrollY = document.body.style.top;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
+  }, [isOpen]);
 
   return (
     // Add Google Font links in your main index.html or dynamically load them
@@ -240,9 +254,13 @@ export default function Navbar() {
 
         /* Mobile Menu Styles */
         @media (max-width: 768px) {
+          body {
+            overflow-x: hidden; /* Prevent horizontal scroll */
+          }
           .nav-hamburger { display: block !important; }
           .nav-links-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            position: fixed; top: 0; right: 0; /* Change left to right */
+            width: 100%; height: 100vh;
             background: ${theme.navMobileBg}; /* Use specific mobile bg */
             backdrop-filter: blur(8px); WebkitBackdropFilter: blur(8px);
             flex-direction: column; align-items: center; justify-content: center;
@@ -252,6 +270,8 @@ export default function Navbar() {
             pointer-events: none; z-index: 51;
             /* Use the same transition as base style */
             transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease;
+            overscroll-behavior: contain; /* Prevent scroll chaining */
+            touch-action: none; /* Disable touch scrolling when menu is open */
           }
           .nav-links-container.open {
             transform: translateX(0); opacity: 1; pointer-events: auto;
