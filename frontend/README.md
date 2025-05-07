@@ -1,70 +1,93 @@
-# Getting Started with Create React App
+# Frontend - PlayGent 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This directory contains the source code for the React-based frontend of the PlayGent platform. It provides the user interface for Browse, playing, and managing GBA games.
+
+## Overview
+
+The frontend is responsible for:
+
+* Displaying the game library.
+* Rendering the GBA emulator within the browser.
+* Handling user interactions for game controls, save/load states, and theming.
+* Communicating with the `playapi` backend to fetch game ROMs and other necessary data.
+
+## Technology Stack
+
+* **React:** A JavaScript library for building user interfaces.
+* **React Router:** For client-side routing and navigation.
+* **Context API / State Management:** For managing global application state (e.g., theme, current game).
+* **react-gbajs :** The core GBA emulator component integrated into React.
+* **Yarn:** For package management.
+
+## Prerequisites
+
+* **Node.js:** (LTS version recommended, e.g., v18.x or v20.x)
+* **Yarn:** (Classic or Berry)
+
+## Setup and Installation
+
+1.  **Clone the repository (if you haven't already):**
+    ```bash
+    git clone <repository-url>
+    cd <repository-name>/frontend
+    ```
+
+2.  **Install dependencies using Yarn:**
+    ```bash
+    yarn install
+    ```
+
+3.  **Run the development server:**
+    ```bash
+    yarn start
+    ```
+    This will typically start the frontend application on `http://localhost:3000`.
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+* `yarn start`: Runs the app in development mode.
+* `yarn build`: Builds the app for production to the `build` folder.
+* `yarn test`: Launches the test runner in interactive watch mode.
+* `yarn eject`: (Use with caution) Removes the single build dependency from your project.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Project Structure (Example)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+frontend/
+├── public/
+│   └── index.html
+│   └── ... (other static assets)
+├── src/
+│   ├── api
+|   |   └── games.js            # API call functions (e.g., to playapi)
+│   ├── images/          # Images, fonts, etc.
+│   ├── components/      # Reusable UI components
+│   ├── App.js           # Main application component
+│   ├── index.js         # Entry point
+│   ├── ThemeContext.js  # Theme config
+|   └── loadingScreen.js # Full screen loading component
+| 
+├── package.json
+└── README.md
 
-### `npm test`
+## Contribution Guidelines
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+We welcome contributions to improve the frontend! Here are some areas where you can help:
 
-### `npm run build`
+* **UI Enhancements:** Improving the look and feel, responsiveness, and accessibility.
+* **New Features:** Implementing features like advanced search/filter for games, new theme options, or improved mobile controls.
+* **Bug Fixes:** Identifying and fixing issues.
+* **Component Refactoring:** Improving code quality and maintainability.
+* **Performance Optimization:** Ensuring the UI runs smoothly, especially during gameplay.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+When contributing:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix (`git checkout -b feature/your-feature-name` or `bugfix/issue-number`).
+3.  Make your changes and commit them with clear, descriptive messages.
+4.  Push your branch to your fork.
+5.  Open a Pull Request to the `main` (or `develop`) branch of the original repository.
+6.  Ensure your code adheres to existing coding styles (consider adding a linter/formatter like ESLint/Prettier if not already present).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+If you plan to make significant changes, it's a good idea to open an issue first to discuss your ideas.
