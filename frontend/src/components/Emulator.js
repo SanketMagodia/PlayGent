@@ -22,10 +22,7 @@ export default function Emulator() {
   const uploadInputRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  useEffect(() => {
-    const isMobile = window.innerWidth <= 700;
-    setShowMobileControls(isMobile);
-  }, []);
+  
 
   useEffect(() => {
     function handleResize() {
@@ -388,7 +385,7 @@ export default function Emulator() {
             {isFullscreen ? "Exit Fullscreen" : "⛶ Fullscreen"}
           </button>
           <button style={uiBtn} onClick={() => setShowHints((v) => !v)}>
-            ⌨️ Keyboard
+            ⌨️ Keyboard Hints
           </button>
           <button
             style={uiBtn}
