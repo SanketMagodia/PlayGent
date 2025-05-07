@@ -218,6 +218,7 @@ export default function Navbar() {
         >
           <NavLink to="/" label="Home" active={location.pathname === "/"} styles={styles} onClick={() => setIsOpen(false)} />
           <NavLink to="/library" label="Library" active={location.pathname.startsWith("/library") || location.pathname.startsWith("/emulator")} styles={styles} onClick={() => setIsOpen(false)} />
+          <NavLink to="/about" label="About" active={location.pathname === "/about"} styles={styles} onClick={() => setIsOpen(false)} />
           <button
             aria-label="Toggle theme"
             onClick={toggle}

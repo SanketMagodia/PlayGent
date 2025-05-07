@@ -7,6 +7,7 @@ import Emulator from "./components/Emulator";
 import { GbaProvider } from "react-gbajs";
 import { ThemeProvider } from "./ThemeContext";
 import AppFooter from "./components/footer";
+import AboutPage from "./components/about";
 
 function NavigationHandler() {
   const location = useLocation();
@@ -38,6 +39,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/library" element={<Library />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route
             path="/emulator/:gameName"
             element={
