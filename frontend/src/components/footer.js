@@ -119,7 +119,7 @@ export default function AppFooter() {
             </a>
           </div>
           <div style={{ display: "flex", gap: 14, marginTop: 10 }}>
-            <a href="https://github.com/SanketMagodia/PlayGent" style={footerIconLink(theme)} title="GitHub" target="_blank" rel="noopener noreferrer"><FaGithub /></a>
+            <a href="https://github.com/SanketMagodia/PlayGent" style={footerIconLink(dark)} title="GitHub" target="_blank" rel="noopener noreferrer"><FaGithub /></a>
             {/* Add more socials as needed */}
           </div>
         </div>
@@ -151,8 +151,8 @@ const footerLink = (dark) => ({
   fontWeight: 500,
 });
 
-const footerIconLink = (theme) => ({
-  color: theme?.gbaAccent || " #1d4ed8",
+const footerIconLink = (dark) => ({
+  color: (dark ? " #67e8f9" : " #2563eb"),
   fontSize: 22,
   textDecoration: "none",
   transition: "color 0.2s",
