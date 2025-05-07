@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { useNavigate } from "react-router-dom";
 // Import useTheme hook - Ensure the path is correct
 import { useTheme } from "../ThemeContext";
@@ -10,12 +10,8 @@ import RedditThreeBox from "./reddit.js";
 import { MemoryFlipGame } from "./memoryFlip";
 import { RockPaperScissors } from "./rockPaper";
 import { Game2048Lite } from "./2048.js";
-// Import images (ensure paths are correct)
-import kirbyImage from "../images/kirby.jpeg";
-import marioImage from "../images/mario.jpeg";
-import pokemonImage from "../images/pokemon.jpeg";
-import spiderManImage from "../images/spiderman.jpeg";
-import sonicImage from "../images/sonic.jpeg";
+
+
 import AshBg from "../images/ash.gif";
 import gokuGif from "../images/goku.gif";
 // Game covers for animation
@@ -510,7 +506,7 @@ export default function Home() {
     { icon: <FaMobileAlt />, title: "Mobile Support", description: "Play on the go! Fully responsive on phones and tablets." },
     { icon: <FaSave />, title: "Save/Load State", description: "Never lose progress. Save and load your game anytime." },
     { icon: <FaCloudUploadAlt />, title: "Cloud Saves (Coming Soon)", description: "Sync your saves across devices seamlessly." },
-    { icon: <FaUserCheck />, title: "Personalized Sessions", description: "Your settings and preferences, remembered." },
+    { icon: <FaUserCheck />, title: "Local Gameplay", description: "Play games locally on your browser, no streaming" },
   ];
 
   return (
@@ -530,43 +526,8 @@ export default function Home() {
         position: 'relative', // Needed for absolute positioned elements like theme toggle
       }}
     >
-      {/* Theme Toggle Button - Moved here for better context */}
-      {/* <button
-           onClick={toggle}
-           className="theme-toggle-button" // Use class for styling
-           aria-label="Toggle theme"
-           style={{
-               position: 'absolute', // Keep positioning logic here
-               top: '20px',
-               right: '20px',
-               zIndex: 10,
-               // Button visual styles moved to CSS below
-           }}
-        >
-           {dark ? <FaSun size={20} color="#fbbf24" /> : <FaMoon size={20} color="#4a5568" />}
-       </button> */}
-
-      {/* Floating animated covers (optional visual fluff) */}
-      {/* ... same code as before ... */}
-      <img
-        src={AshBg}
-        alt="Gaming Animation"
-        style={{
-          position: "absolute",
-          top: "19%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "clamp(200px, 30vw, 400px)", // Adjust size as needed
-          height: "auto",
-          objectFit: "contain",
-          // opacity: dark ? 0.4 : 0.4,
-          filter: "blur(1px)",
-          zIndex: 1,
-          pointerEvents: "none",
-          borderRadius: "12px",
-          transition: "opacity 0.3s",
-        }}
-      />
+      
+      
 
       {/* Global Styles & Animations */}
       <style>{`
@@ -693,7 +654,7 @@ export default function Home() {
       `}</style>
 
       {/* --- Hero Section --- */}
-      <section className="home-section hero-section" style={{marginBottom: 100}}>
+      <section className="home-section hero-section" >
         {/* Left side (GBA Display) */}
         <div style={{ width: '100%', maxWidth: '450px', flexShrink: 0 }}> {/* Container for GBA */}
           <GbaConsoleDisplay theme={theme} />
@@ -741,7 +702,26 @@ export default function Home() {
         </div>
 
       </section>
-
+      {/* --- Gaming Animation Section --- */}
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  margin: '40px 0', // Add spacing between sections
+}}>
+  <img
+    src={AshBg}
+    alt="Gaming Animation"
+    style={{
+      width: "clamp(200px, 30vw, 400px)", // Adjust size as needed
+      height: "auto",
+      objectFit: "contain",
+      filter: "blur(1px)",
+      borderRadius: "12px",
+      transition: "opacity 0.3s",
+    }}
+  />
+</div>
       {/* --- Reddit Section --- */}
       <h2 className="section-heading">Community</h2>
       <RedditThreeBox />

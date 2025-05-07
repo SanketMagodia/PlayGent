@@ -15,57 +15,48 @@ export default function Emulator() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [scale, setScale] = useState(1);
-  const containerRef = useRef();
-  const canvasContainerRef = useRef();
+  const containerRef = useRef(null); // Main component container
+  const canvasContainerRef = useRef(null);
+  const fullscreenHostRef = useRef(null); // New ref for the element that will go fullscreen
   const [showMobileControls, setShowMobileControls] = useState(false);
-  const uploadInputRef = useRef();
+  const uploadInputRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  useEffect(() => {
-    const handleMobileCheck = () => {
-      const isMobile = window.innerWidth <= 700;
-      setShowMobileControls(isMobile);
-    };
 
-    handleMobileCheck(); // Initial check
-    window.addEventListener('resize', handleMobileCheck);
-    
-    return () => window.removeEventListener('resize', handleMobileCheck);
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 700;
+    setShowMobileControls(isMobile);
   }, []);
-  // Responsive scaling based on container width, keeping 3:2 aspect ratio
-  // Responsive scaling based on container width, keeping 3:2 aspect ratio
+
   useEffect(() => {
     function handleResize() {
-      if (canvasContainerRef.current) {
+      if (canvasContainerRef.current && !document.fullscreenElement) { // Only apply custom scaling when not fullscreen
         const container = canvasContainerRef.current;
-        const maxWidth = window.innerWidth * 0.8; // 70% of viewport width
+        const maxWidth = window.innerWidth * 0.8;
         const containerWidth = window.innerWidth > 700 ?
           Math.min(container.offsetWidth, maxWidth) :
-          container.offsetWidth; // 100% width on mobile
+          container.offsetWidth;
 
-        // Calculate height based on 3:2 aspect ratio
         const containerHeight = containerWidth / 1.5;
-
-        // Calculate scale based on GBA's native resolution (240x160)
         const widthScale = containerWidth / 240;
         const heightScale = containerHeight / 160;
-
-        // Use the smaller scale to prevent distortion
         setScale(Math.min(widthScale, heightScale));
+      } else if (document.fullscreenElement) {
+        // In fullscreen, ReactGbaJs with 100% width/height and object-fit:contain
+        // will handle scaling. We can reset our custom scale or set it to a sensible default.
+        // Or, let ReactGbaJs handle it entirely via its parent's dimensions.
+        // For simplicity, we might not need to change `scale` here if CSS handles fullscreen sizing well.
       }
     }
     window.addEventListener("resize", handleResize);
-    handleResize(); // initial
+    handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [isFullscreen]); // Re-evaluate on fullscreen change too
 
-  // Load ROM on mount or game change
   useEffect(() => {
     if (!gameName || loadedRom.current === gameName) return;
-
     const controller = new AbortController();
     setLoading(true);
     setError("");
-
     const loadRom = async () => {
       try {
         const arrayBuffer = await fetchRom(gameName, controller.signal);
@@ -79,12 +70,10 @@ export default function Emulator() {
         }
       }
     };
-
     loadRom();
     return () => controller.abort();
   }, [gameName, play]);
 
-  // Stop and reset emulator on unmount/navigation away
   useEffect(() => {
     return () => {
       if (window.gba) {
@@ -97,7 +86,6 @@ export default function Emulator() {
     };
   }, []);
 
-  // Download state file for cross-device use
   const downloadState = async () => {
     try {
       const state = await saveState();
@@ -115,7 +103,6 @@ export default function Emulator() {
     }
   };
 
-  // Upload state file to restore progress
   const uploadState = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -135,143 +122,146 @@ export default function Emulator() {
     e.target.value = "";
   };
 
-  // Fullscreen (use the container, not the canvas)
   const goFullscreen = () => {
-    const el = canvasContainerRef.current; // Change to canvas container instead of whole page
+    const el = fullscreenHostRef.current; // Target the new host element
     if (!el) return;
 
     if (!document.fullscreenElement) {
-      if (el.requestFullscreen) {
-        el.requestFullscreen();
-      } else if (el.webkitRequestFullscreen) {
-        el.webkitRequestFullscreen();
-      }
-      setIsFullscreen(true);
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      // setIsFullscreen(true); // This will be handled by the event listener
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      }
-      setIsFullscreen(false);
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      // setIsFullscreen(false); // Handled by listener
     }
   };
 
-  // Add fullscreen change listener
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const isCurrentlyFullscreen = !!document.fullscreenElement;
+      setIsFullscreen(isCurrentlyFullscreen);
+      if (containerRef.current) {
+        if (isCurrentlyFullscreen) {
+          containerRef.current.classList.add('emulator-body-fullscreen-active');
+        } else {
+          containerRef.current.classList.remove('emulator-body-fullscreen-active');
+        }
+      }
     };
-
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      if (containerRef.current) { // Cleanup class on unmount
+        containerRef.current.classList.remove('emulator-body-fullscreen-active');
+      }
     };
   }, []);
 
   return (
     <div
       ref={containerRef}
+      className="emulator-page-container" // Added a class for easier targeting
       style={{
         minHeight: "100vh",
-        // background: "linear-gradient(120deg,#151a29 0%,#232b42 100%)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "flex-start",
+        justifyContent: "flex-start", // Changed from "center" to "flex-start" for title
         position: "relative",
         padding: "0 8px"
       }}
     >
-      {/* Responsive styles for canvas container */}
       <style>{`
-  @media (max-width: 700px) {
-    .gba-canvas-container {
-      width: 100% !important;
-      min-width: 240px !important;
-      max-width: 100% !important;
-    }
-  }
-`}</style>
-      <style>{`
-  :fullscreen .gba-canvas-container,
-  :-webkit-full-screen .gba-canvas-container {
-    width: 100vw !important;
-    height: 100vh !important;
-    max-width: none !important;
-    background: black !important;
-    border: none !important;
-    border-radius: 0 !important;
-  }
+        /* Styles for when the specific fullscreen host is active */
+        .fullscreen-host-element:-webkit-full-screen {
+          background: black !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: center !important; /* Center canvas if it doesn't fill height */
+          align-items: center !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .fullscreen-host-element:fullscreen {
+          background: black !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          display: flex !important;
+          flex-direction: column !important;
+          justify-content: center !important;
+          align-items: center !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
 
-  :fullscreen .controls-container,
-  :fullscreen .title-container,
-  :fullscreen .tips-container,
-  :-webkit-full-screen .controls-container,
-  :-webkit-full-screen .title-container,
-  :-webkit-full-screen .tips-container {
-    display: none !important;
-  }
+        /* Canvas container within our fullscreen host */
+        .fullscreen-host-element:-webkit-full-screen .gba-canvas-container {
+          width: 100% !important; /* Allow it to be flexible within the host */
+          /* height is determined by aspect ratio and parent height */
+          max-width: 100vw !important;
+          max-height: 100vh !important; /* Ensure it fits viewport height */
+          background: black !important;
+          border: none !important;
+          border-radius: 0 !important;
+          flex-grow: 1; /* Allow canvas container to take up space */
+          display: flex; /* To center the canvas itself if ReactGbaJs doesn't fill */
+          align-items: center;
+          justify-content: center;
+        }
+        .fullscreen-host-element:fullscreen .gba-canvas-container {
+          width: 100% !important;
+          max-width: 100vw !important;
+          max-height: 100vh !important;
+          background: black !important;
+          border: none !important;
+          border-radius: 0 !important;
+          flex-grow: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        /* Mobile controls wrapper within our fullscreen host */
+        .fullscreen-host-element:-webkit-full-screen .mobile-controls-fullscreen-wrapper {
+          display: block !important; /* Ensure it's shown if showMobileControls is true */
+          width: 100%;
+          position: absolute; /* Position over the canvas at the bottom */
+          bottom: 0;
+          left: 0;
+          z-index: 100; /* Make sure it's on top */
+          /* Add any specific styling for mobile controls in fullscreen */
+        }
+        .fullscreen-host-element:fullscreen .mobile-controls-fullscreen-wrapper {
+          display: block !important;
+          width: 100%;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          z-index: 100;
+        }
 
-  /* Keep mobile controls visible in fullscreen on mobile */
-  @media (max-width: 700px) {
-    :fullscreen .mobile-controls,
-    :-webkit-full-screen .mobile-controls {
-      display: flex !important;
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      z-index: 9999 !important;
-      background: rgba(0, 0, 0, 0.5) !important;
-      padding: 10px !important;
-    }
-  }
-`}</style>
-
-      {/* Update the fullscreen styles */}
-      <style>{`
-  :fullscreen .gba-canvas-container,
-  :-webkit-full-screen .gba-canvas-container {
-    width: 100vw !important;
-    height: 100vh !important;
-    max-width: none !important;
-    background: black !important;
-    border: none !important;
-    border-radius: 0 !important;
-  }
-
-  :fullscreen .controls-container,
-  :fullscreen .title-container,
-  :fullscreen .tips-container,
-  :-webkit-full-screen .controls-container,
-  :-webkit-full-screen .title-container,
-  :-webkit-full-screen .tips-container {
-    display: none !important;
-  }
-
-  /* Mobile Controls in Fullscreen */
-  @media (max-width: 700px) {
-    :fullscreen .mobile-controls,
-    :-webkit-full-screen .mobile-controls {
-      display: flex !important;
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      z-index: 9999 !important;
-      background: rgba(0, 0, 0, 0.5) !important;
-      padding: 10px !important;
-      pointer-events: auto !important;
-      touch-action: auto !important;
-    }
-  }
-`}</style>
+        /* Hide other page elements when emulator-body-fullscreen-active is on the containerRef */
+        .emulator-body-fullscreen-active .page-element-to-hide {
+          display: none !important;
+        }
+        
+        /* Responsive styles for canvas container (normal view) */
+        @media (max-width: 700px) {
+          .gba-canvas-container {
+            width: 100% !important;
+            min-width: 240px !important; /* GBA native width */
+            max-width: 100% !important;
+          }
+        }
+      `}</style>
 
       <h2
+        className="page-element-to-hide" // Class to hide in fullscreen
         style={{
           color: "#fff",
           marginTop: 32,
@@ -286,42 +276,38 @@ export default function Emulator() {
       </h2>
 
       <div
-        style={{
+        style={{ // This is the main content wrapper below the title
           margin: "0px 0 16px 0",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           position: "relative",
           width: "100%",
-          maxWidth: 1000, // Increased from 600 to allow wider game screen
+          maxWidth: 1000,
         }}
       >
-        {/* Emulator Display */}
+        {/* Emulator Display and Mobile Controls Host for Fullscreen */}
         <div
+          ref={fullscreenHostRef}
+          className="fullscreen-host-element" // Class for specific fullscreen styling
           style={{
-            background: "#111",
-            borderRadius: 22,
-            boxShadow: "0 6px 32px #000b",
-            padding: 18,
-            display: "flex",
+            background: isFullscreen ? "black" : "#111", // Dynamic background
+            borderRadius: isFullscreen ? 0 : 22,
+            boxShadow: isFullscreen ? "none" : "0 6px 32px #000b",
+            padding: isFullscreen ? 0 : 18,
+            display: "flex", // Using flex to manage children
+            flexDirection: "column", // Stack canvas and controls
             justifyContent: "center",
             alignItems: "center",
-            position: "relative",
+            position: "relative", // For absolute positioning of mobile controls in fullscreen
             width: "100%",
-            maxWidth: 1000,
+            maxWidth: 1000, // Max width in normal mode
+            // height will be auto or defined by children / fullscreen
           }}
         >
-          {loading && (
-            <FullScreenLoading />
-          )}
-          {error && (
-            <div
-              style={{
-                color: "#f66",
-                fontWeight: 600,
-                padding: 24
-              }}
-            >
+          {loading && !isFullscreen && <FullScreenLoading />}
+          {error && !isFullscreen && (
+            <div style={{ color: "#f66", fontWeight: 600, padding: 24 }}>
               {error}
             </div>
           )}
@@ -329,8 +315,8 @@ export default function Emulator() {
             ref={canvasContainerRef}
             className="gba-canvas-container"
             style={{
-              width: "100%", // Default to 70% width
-              height: "auto", // Height will be determined by aspect ratio
+              width: "100%", 
+              height: "auto",
               aspectRatio: "3 / 2",
               background: "#222",
               borderRadius: 12,
@@ -339,20 +325,21 @@ export default function Emulator() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto",
+              margin: "0 auto", // Center in normal view
               transition: "all 0.3s"
+              // Fullscreen styles will override via CSS
             }}
           >
             <ReactGbaJs
-              scale={scale}
+              scale={scale} // Scale primarily for non-fullscreen
               volume={1}
               key={gameName}
               style={{
                 display: loading ? "none" : "block",
-                width: "100%",
-                height: "100%",
+                width: "100%", // Fill the .gba-canvas-container
+                height: "100%", // Fill the .gba-canvas-container
                 imageRendering: "pixelated",
-                objectFit: "contain"
+                objectFit: "contain", // Important for aspect ratio
               }}
               canvasProps={{
                 id: "gba-canvas",
@@ -361,17 +348,19 @@ export default function Emulator() {
               }}
             />
           </div>
+
+          {/* Mobile Controls - wrapped for fullscreen styling */}
+          {showMobileControls && (
+            <div className="mobile-controls-fullscreen-wrapper">
+              <MobileControls />
+            </div>
+          )}
         </div>
 
-        {/* Mobile Controls below emulator */}
-        {(showMobileControls || (isFullscreen && window.innerWidth <= 700)) && (
-          <div className="mobile-controls">
-            <MobileControls />
-          </div>
-        )}
 
-        {/* Controls */}
+        {/* Main Controls (buttons) - to be hidden in fullscreen */}
         <div
+          className="page-element-to-hide" // Class to hide in fullscreen
           style={{
             marginTop: 18,
             display: "flex",
@@ -396,7 +385,7 @@ export default function Emulator() {
             style={{ display: "none" }}
           />
           <button style={uiBtn} onClick={goFullscreen}>
-            ⛶ Fullscreen
+            {isFullscreen ? "Exit Fullscreen" : "⛶ Fullscreen"}
           </button>
           <button style={uiBtn} onClick={() => setShowHints((v) => !v)}>
             ⌨️ Keyboard
@@ -408,7 +397,12 @@ export default function Emulator() {
             {showMobileControls ? "Hide Touch Controls" : "Show Touch Controls"}
           </button>
         </div>
-        <div style={{ color: "#aaa", fontSize: 14, marginTop: 10, textAlign: "center" }}>
+
+        {/* Tips - to be hidden in fullscreen */}
+        <div
+          className="page-element-to-hide" // Class to hide in fullscreen
+          style={{ color: "#aaa", fontSize: 14, marginTop: 10, textAlign: "center" }}
+        >
           <div>
             <b>Tip:</b> Download your <code>.gbastate</code> file to back up or continue on another device.
             Upload a <code>.gbastate</code> file to restore your progress.
@@ -419,13 +413,13 @@ export default function Emulator() {
         </div>
       </div>
 
-      {/* Keyboard Hints Overlay */}
-      {showHints && <KeyboardHints onClose={() => setShowHints(false)} />}
+      {/* Keyboard Hints Overlay - will be hidden by page-element-to-hide if its parent gets it */}
+      {/* Or, add the class directly if it's outside the flow */}
+      {showHints && <div className="page-element-to-hide"><KeyboardHints onClose={() => setShowHints(false)} /></div>}
     </div>
   );
 }
 
-// --- Helper styles and functions ---
 const uiBtn = {
   background: "linear-gradient(90deg,#67e8f9 0%,#38bdf8 100%)",
   color: "#222",
