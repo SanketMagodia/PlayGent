@@ -64,15 +64,7 @@ const getMiniGameStyles = (theme) => ({ /* ... same code as previous version ...
     miniGameSquareBg: "#edf2f7",
     miniGameSquareBorder: "rgba(66, 153, 225, 0.5)",
     };
-    const darkThemeColors = {
-    miniGameText: "#f56565", // Red text
-    miniGameTextSecondary: "#a0aec0",
-    miniGameBg: "#1a202c", // Dark background
-    miniGameBorder: "#2d3748",
-    miniGameShadow: "rgba(0, 0, 0, 0.3)",
-    miniGameSquareBg: "#2d3748",
-    miniGameSquareBorder: "rgba(245, 101, 101, 0.5)",
-    };
+  
 const choices = [
   { icon: <FaHandRock />, name: "Rock" },
   { icon: <FaHandPaper />, name: "Paper" },

@@ -55,24 +55,7 @@ const getMiniGameStyles = (theme) => ({ /* ... same code as previous version ...
       lineHeight: 1,
     }
   });
-  const lightThemeColors = {
-    miniGameText: "#4299e1",
-    miniGameTextSecondary: "#4a5568",
-    miniGameBg: "#f7fafc", // Very light gray background
-    miniGameBorder: "#e2e8f0",
-    miniGameShadow: "rgba(0, 0, 0, 0.06)",
-    miniGameSquareBg: "#edf2f7",
-    miniGameSquareBorder: "rgba(66, 153, 225, 0.5)",
-    };
-    const darkThemeColors = {
-    miniGameText: "#f56565", // Red text
-    miniGameTextSecondary: "#a0aec0",
-    miniGameBg: "#1a202c", // Dark background
-    miniGameBorder: "#2d3748",
-    miniGameShadow: "rgba(0, 0, 0, 0.3)",
-    miniGameSquareBg: "#2d3748",
-    miniGameSquareBorder: "rgba(245, 101, 101, 0.5)",
-    };
+
 function slide(row) {
   let arr = row.filter(n => n);
   for (let i = 0; i < arr.length - 1; i++) {

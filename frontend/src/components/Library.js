@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 // import { useTheme } from "../ThemeContext";
 import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 // --- GameCard.js ---
-import { FaGamepad } from "react-icons/fa";
 import { useTheme } from "../ThemeContext";
 import { fetchGames } from "../api/games"; // Adjust the import path as necessary
 import GameCard from "./GameCard";
@@ -64,7 +63,7 @@ export default function Library() {
       <h2 style={{
         fontSize: "clamp(1.5rem, 5vw, 2.2rem)",
         fontWeight: 800,
-        color:  " #c2410c",
+        color:  (dark ? " #c2410c" : " #2563eb"),
         marginBottom: 18,
         letterSpacing: 1,
         textShadow: dark ? "0 2px 8px #0008" : "0 2px 8px #fff8"

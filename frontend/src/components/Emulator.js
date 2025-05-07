@@ -5,7 +5,6 @@ import { GbaContext } from "react-gbajs";
 import ReactGbaJs from "react-gbajs";
 import MobileControls from "./MobileControls";
 import KeyboardHints from "./KeyboardHints";
-import { useTheme } from "../ThemeContext";
 import FullScreenLoading from "../loadingScreen";
 
 export default function Emulator() {
@@ -20,25 +19,29 @@ export default function Emulator() {
   const canvasContainerRef = useRef();
   const [showMobileControls, setShowMobileControls] = useState(false);
   const uploadInputRef = useRef();
-
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 700;
+    setShowMobileControls(isMobile);
+  }, []);
   // Responsive scaling based on container width, keeping 3:2 aspect ratio
   // Responsive scaling based on container width, keeping 3:2 aspect ratio
   useEffect(() => {
     function handleResize() {
       if (canvasContainerRef.current) {
         const container = canvasContainerRef.current;
-        const maxWidth = window.innerWidth * 0.7; // 70% of viewport width
-        const containerWidth = window.innerWidth > 700 ? 
-          Math.min(container.offsetWidth, maxWidth) : 
+        const maxWidth = window.innerWidth * 0.8; // 70% of viewport width
+        const containerWidth = window.innerWidth > 700 ?
+          Math.min(container.offsetWidth, maxWidth) :
           container.offsetWidth; // 100% width on mobile
-        
+
         // Calculate height based on 3:2 aspect ratio
         const containerHeight = containerWidth / 1.5;
-        
+
         // Calculate scale based on GBA's native resolution (240x160)
         const widthScale = containerWidth / 240;
         const heightScale = containerHeight / 160;
-        
+
         // Use the smaller scale to prevent distortion
         setScale(Math.min(widthScale, heightScale));
       }
@@ -127,13 +130,40 @@ export default function Emulator() {
 
   // Fullscreen (use the container, not the canvas)
   const goFullscreen = () => {
-    const el = containerRef.current;
-    if (el && el.requestFullscreen) {
-      el.requestFullscreen();
-    } else if (el && el.webkitRequestFullscreen) {
-      el.webkitRequestFullscreen();
+    const el = canvasContainerRef.current; // Change to canvas container instead of whole page
+    if (!el) return;
+
+    if (!document.fullscreenElement) {
+      if (el.requestFullscreen) {
+        el.requestFullscreen();
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+      setIsFullscreen(false);
     }
   };
+
+  // Add fullscreen change listener
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   return (
     <div
@@ -182,7 +212,7 @@ export default function Emulator() {
           alignItems: "center",
           position: "relative",
           width: "100%",
-          maxWidth: 900, // Increased from 600 to allow wider game screen
+          maxWidth: 1000, // Increased from 600 to allow wider game screen
         }}
       >
         {/* Emulator Display */}
@@ -197,11 +227,11 @@ export default function Emulator() {
             alignItems: "center",
             position: "relative",
             width: "100%",
-            maxWidth: 900,
+            maxWidth: 1000,
           }}
         >
           {loading && (
-            <FullScreenLoading/>
+            <FullScreenLoading />
           )}
           {error && (
             <div
@@ -215,41 +245,41 @@ export default function Emulator() {
             </div>
           )}
           <div
-  ref={canvasContainerRef}
-  className="gba-canvas-container"
-  style={{
-    width: "70%", // Default to 70% width
-    height: "auto", // Height will be determined by aspect ratio
-    aspectRatio: "3 / 2",
-    background: "#222",
-    borderRadius: 12,
-    overflow: "hidden",
-    border: "2px solid #333",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto",
-    transition: "all 0.3s"
-  }}
->
-  <ReactGbaJs
-    scale={scale}
-    volume={1}
-    key={gameName}
-    style={{ 
-      display: loading ? "none" : "block",
-      width: "100%",
-      height: "100%",
-      imageRendering: "pixelated",
-      objectFit: "contain"
-    }}
-    canvasProps={{ 
-      id: "gba-canvas", 
-      tabIndex: 0,
-      style: { width: '100%', height: '100%' }
-    }}
-  />
-</div>
+            ref={canvasContainerRef}
+            className="gba-canvas-container"
+            style={{
+              width: "100%", // Default to 70% width
+              height: "auto", // Height will be determined by aspect ratio
+              aspectRatio: "3 / 2",
+              background: "#222",
+              borderRadius: 12,
+              overflow: "hidden",
+              border: "2px solid #333",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto",
+              transition: "all 0.3s"
+            }}
+          >
+            <ReactGbaJs
+              scale={scale}
+              volume={1}
+              key={gameName}
+              style={{
+                display: loading ? "none" : "block",
+                width: "100%",
+                height: "100%",
+                imageRendering: "pixelated",
+                objectFit: "contain"
+              }}
+              canvasProps={{
+                id: "gba-canvas",
+                tabIndex: 0,
+                style: { width: '100%', height: '100%' }
+              }}
+            />
+          </div>
         </div>
 
         {/* Mobile Controls below emulator */}

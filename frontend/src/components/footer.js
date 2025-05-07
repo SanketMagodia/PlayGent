@@ -1,5 +1,6 @@
-import { FaEnvelope, FaGithub, FaBookOpen, FaHome, FaGamepad, FaInfoCircle } from "react-icons/fa";
+import { FaEnvelope, FaGithub,  FaHome, FaGamepad, FaInfoCircle } from "react-icons/fa";
 import { useTheme } from "../ThemeContext";
+import readQuestLogo from '../images/readquest.png';
 
 export default function AppFooter() {
   const { dark, theme } = useTheme();
@@ -44,7 +45,7 @@ export default function AppFooter() {
               alignItems: "center",
               fontWeight: 900,
               fontSize: 26,
-              color: theme?.gbaAccent || (dark ? "#67e8f9" : "#2563eb"),
+              color:  (dark ? " #67e8f9" : " #2563eb"),
               letterSpacing: 1.1,
               marginBottom: 10,
             }}
@@ -56,37 +57,47 @@ export default function AppFooter() {
           </div>
         </div>
         <div>
-            <a
-              href="https://readquest.site" // Actual ReadQuest link
-              target="_blank"
-              rel="noopener noreferrer"
+          <a
+            href="https://readquest.site" // Actual ReadQuest link
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex", // To align icon and text
+              alignItems: "center",
+              fontSize: 26, // Header-like size
+              fontWeight: 900,
+              color: theme?.gbaAccent || (dark ? "white" : "black"),
+              textDecoration: "none",
+              transition: "color 0.2s ease-in-out",
+              marginBottom: 8, // Space below the ReadQuest header
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = theme?.gbaAccentHover || (dark ? " #9ff0ff" : "rgb(30, 104, 138)")}
+            onMouseLeave={e => e.currentTarget.style.color = theme?.gbaAccent || (dark ? "white" : "black")}
+          >
+            <img
+              src={readQuestLogo}
+              alt="ReadQuest Logo"
               style={{
-                display: "inline-flex", // To align icon and text
-                alignItems: "center",
-                fontSize: 16, // Header-like size
-                fontWeight: 700,
-                color: theme?.gbaAccent || (dark ? "#81e6f9" : "#1d4ed8"),
-                textDecoration: "none",
-                transition: "color 0.2s ease-in-out",
-                marginBottom: 8, // Space below the ReadQuest header
+                height: 24,
+                width: 24,
+                marginRight: 10,
+                objectFit: 'contain',
+                verticalAlign: 'middle'
               }}
-              onMouseEnter={e => e.currentTarget.style.color = theme?.gbaAccentHover || (dark ? "#9ff0ff" : "#1e3a8a")}
-              onMouseLeave={e => e.currentTarget.style.color = theme?.gbaAccent || (dark ? "#81e6f9" : "#1d4ed8")}
-            >
-              <FaBookOpen style={{ ...iconStyle, fontSize: 20, marginRight: 10, color: 'inherit' }} />
-              ReadQuest.site
-            </a>
-            <div style={{ fontSize: 14, lineHeight: 1.6, color: theme?.mutedTextColor || (dark ? "#cbd5e1" : "#374151") }}>
-              Love books? Discover your next literary adventure with us!
-            </div>
+            />
+            ReadQuest.site
+          </a>
+          <div style={{ fontSize: 14, lineHeight: 1.6, color: theme?.mutedTextColor || (dark ? "#cbd5e1" : "#374151") }}>
+            Love books? Discover your next literary adventure with us!
           </div>
-        
+        </div>
+
 
         {/* Links */}
         <div style={{ flex: "1 1 120px", minWidth: 120 }}>
           <div style={{
             fontWeight: 700, fontSize: 15, marginBottom: 8,
-            color: theme?.gbaAccent || "#67e8f9"
+            color:(dark ? " #67e8f9" : " #2563eb")
           }}>Links</div>
           <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 2 }}>
             <li><a href="/" style={footerLink(dark)}><FaHome style={iconStyle} /> Home</a></li>
@@ -98,7 +109,7 @@ export default function AppFooter() {
         <div style={{ flex: "1 1 180px", minWidth: 180 }}>
           <div style={{
             fontWeight: 700, fontSize: 15, marginBottom: 8,
-            color: theme?.gbaAccent || "#67e8f9"
+            color: (dark ? " #67e8f9" : " #2563eb")
           }}>Contact</div>
           <div style={{ marginBottom: 8 }}>
             <a href="mailto:magodiasanket@gmail.com" style={{
@@ -141,7 +152,7 @@ const footerLink = (dark) => ({
 });
 
 const footerIconLink = (theme) => ({
-  color: theme?.gbaAccent || "#67e8f9",
+  color: theme?.gbaAccent || " #1d4ed8",
   fontSize: 22,
   textDecoration: "none",
   transition: "color 0.2s",

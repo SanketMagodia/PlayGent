@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 // Import useTheme hook - Ensure the path is correct
 import { useTheme } from "../ThemeContext";
 import {
-  FaGamepad, FaDice, FaTimes, FaCircle, FaSun, FaMoon,
+  FaGamepad, FaDice, FaTimes, FaCircle,
   FaMobileAlt, FaSave, FaCloudUploadAlt, FaUserCheck, FaBan, FaGift // Icons for features
 } from "react-icons/fa";
+import RedditThreeBox from "./reddit.js";
 import { MemoryFlipGame } from "./memoryFlip";
 import { RockPaperScissors } from "./rockPaper";
 import { Game2048Lite } from "./2048.js";
@@ -15,15 +16,10 @@ import marioImage from "../images/mario.jpeg";
 import pokemonImage from "../images/pokemon.jpeg";
 import spiderManImage from "../images/spiderman.jpeg";
 import sonicImage from "../images/sonic.jpeg";
-
+import AshBg from "../images/ash.gif";
+import gokuGif from "../images/goku.gif";
 // Game covers for animation
-const gameImages = [
-  { src: kirbyImage, alt: "Kirby" },
-  { src: marioImage, alt: "Mario" },
-  { src: pokemonImage, alt: "Pokemon" },
-  { src: spiderManImage, alt: "Spiderman" },
-  { src: sonicImage, alt: "Sonic" },
-];
+
 
 // --- Updated Theme Colors ---
 const lightThemeColors = {
@@ -75,8 +71,8 @@ const darkThemeColors = {
   gbaScreenBg: "#111827", // Even darker screen
   gbaButtonPrimary: "#718096", // Gray buttons
   gbaButtonSecondary: " #a0aec0",
-  gbaDpad: " #e2e8f0", // Lighter D-pad
-  gbaDpadButtons: "rgb(89, 92, 97)",
+  gbaDpad: "rgb(161, 163, 165)", // Lighter D-pad
+  gbaDpadButtons: "rgb(60, 62, 65)",
   gbaText: "#f7fafc",
   gbaBorder: "#4a5568",
   buttonText: "#ffffff",
@@ -92,21 +88,10 @@ const darkThemeColors = {
 
 
 // --- GBA Console Display Component ---
-function GbaConsoleDisplay({ theme, gameImages }) {
-  const slideshowRef = useRef();
+function GbaConsoleDisplay({ theme }) {
   const gbaColors = theme; // Use the main theme object directly for GBA colors
 
-  useEffect(() => {
-    let idx = 0;
-    const interval = setInterval(() => {
-      if (slideshowRef.current) {
-        // Match height below (100px)
-        slideshowRef.current.style.transform = `translateY(-${idx * 100}px)`;
-      }
-      idx = (idx + 1) % gameImages.length;
-    }, 2800);
-    return () => clearInterval(interval);
-  }, [gameImages]);
+
 
   return (
     <div style={{ // Outer container for positioning/scaling
@@ -138,18 +123,17 @@ function GbaConsoleDisplay({ theme, gameImages }) {
             background: gbaColors.gbaDpad,
             position: 'relative',
             borderRadius: '5px',
-            boxShadow: 'inset 0 0 5px rgba(0,0,0,0.2)',
+            boxShadow: 'inset 0 0 5px rgba(0, 0, 0, 0.41)',
             transition: 'background 0.3s ease',
           }}>
             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '20px', height: '100%', background: gbaColors.gbaDpadButtons, borderRadius: '3px' }}></div>
             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '100%', height: '20px', background: gbaColors.gbaDpadButtons, borderRadius: '3px' }}></div>
             {/* D-pad inner detail */}
-            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '15px', height: '15px', background: 'rgba(0, 0, 0, 0.16)', borderRadius: '50%' }}></div>
           </div>
         </div>
 
         {/* Center (Screen & Logo) */}
-        <div style={{ width: '60%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ width: '80%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {/* Screen Bezel */}
           <div style={{
             width: '100%',
@@ -164,7 +148,7 @@ function GbaConsoleDisplay({ theme, gameImages }) {
             {/* Actual Screen */}
             <div style={{
               width: '100%',
-              height: '130px', // Inner screen height
+              height: '140px', // Inner screen height
               background: gbaColors.gbaScreenBg,
               borderRadius: '4px',
               overflow: 'hidden',
@@ -173,11 +157,16 @@ function GbaConsoleDisplay({ theme, gameImages }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'background 0.3s ease',
             }}>
-              <div ref={slideshowRef} style={{ transition: "transform 0.8s ease-in-out", width: '100%', height: '100%' }}>
-                {gameImages.concat(gameImages.slice(0, 1)).map((img, i) => (
-                  <img key={i} src={img.src} alt={img.alt} style={{ width: "100%", height: "100%", objectFit: "cover", display: 'block' }} />
-                ))}
-              </div>
+              <img
+                src={gokuGif}
+                alt="Gaming Animation"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: 'block'
+                }}
+              />
               {/* Screen Glare */}
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: `linear-gradient(160deg, rgba(255,255,255,${darkThemeColors ? '0.05' : '0.15'}) 0%, transparent 50%)`, pointerEvents: 'none', borderRadius: '4px' }} />
             </div>
@@ -511,7 +500,7 @@ function FeatureCard({ icon, title, description, theme }) {
 // --- Main Home Component ---
 export default function Home() {
   const navigate = useNavigate();
-  const { dark, toggle } = useTheme();
+  const { dark } = useTheme();
   const theme = dark ? darkThemeColors : lightThemeColors;
 
   // Feature list
@@ -559,36 +548,30 @@ export default function Home() {
 
       {/* Floating animated covers (optional visual fluff) */}
       {/* ... same code as before ... */}
-      {gameImages.map((img, i) => (
-        <img
-          key={i}
-          src={img.src}
-          alt={img.alt}
-          style={{
-            position: "absolute",
-            top: `${15 + Math.sin(i * 1.2) * 28}%`,
-            left: `calc(${i * 18 + 10}% - 25px)`, // Centered by width
-            width: `clamp(32px, 7vw, 54px)`,
-            height: `clamp(32px, 7vw, 54px)`,
-            objectFit: "cover",
-            aspectRatio: "1 / 1",
-            opacity: dark ? (0.05 + 0.03 * (i % 3)) : (0.09 + 0.05 * (i % 3)),
-            filter: "blur(2.5px)",
-            zIndex: 1,
-            animation: `float${i} ${9 + i * 1.5}s ease-in-out infinite alternate`,
-            pointerEvents: "none",
-            borderRadius: "8px",
-            transition: "opacity 0.3s",
-          }}
-        />
-      ))}
+      <img
+        src={AshBg}
+        alt="Gaming Animation"
+        style={{
+          position: "absolute",
+          top: "19%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "clamp(200px, 30vw, 400px)", // Adjust size as needed
+          height: "auto",
+          objectFit: "contain",
+          // opacity: dark ? 0.4 : 0.4,
+          filter: "blur(1px)",
+          zIndex: 1,
+          pointerEvents: "none",
+          borderRadius: "12px",
+          transition: "opacity 0.3s",
+        }}
+      />
 
       {/* Global Styles & Animations */}
       <style>{`
         /* Float Animation */
-        ${gameImages.map((_, i) => `@keyframes float${i} { 0% { transform: translateY(0) scale(1);}
-      100% { transform: translateY(${i % 2 === 0 ? -18 : 18}px) scale(${1 + (i % 2 ? 0.06 : -0.06)});
-      } }` ).join("\n")}
+    
 
          /* Section Base Styles */
         .home-section {
@@ -710,10 +693,10 @@ export default function Home() {
       `}</style>
 
       {/* --- Hero Section --- */}
-      <section className="home-section hero-section">
+      <section className="home-section hero-section" style={{marginBottom: 100}}>
         {/* Left side (GBA Display) */}
         <div style={{ width: '100%', maxWidth: '450px', flexShrink: 0 }}> {/* Container for GBA */}
-          <GbaConsoleDisplay theme={theme} gameImages={gameImages} />
+          <GbaConsoleDisplay theme={theme} />
         </div>
         {/* Right side (Content) */}
         <div className="hero-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}> {/* Align center on mobile */}
@@ -758,6 +741,11 @@ export default function Home() {
         </div>
 
       </section>
+
+      {/* --- Reddit Section --- */}
+      <h2 className="section-heading">Community</h2>
+      <RedditThreeBox />
+
       {/* --- Features Section --- */}
       <section className="home-section features-section">
         <h2 className="section-heading">Why PlayGent?</h2>
