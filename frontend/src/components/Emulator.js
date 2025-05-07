@@ -21,8 +21,15 @@ export default function Emulator() {
   const uploadInputRef = useRef();
   const [isFullscreen, setIsFullscreen] = useState(false);
   useEffect(() => {
-    const isMobile = window.innerWidth <= 700;
-    setShowMobileControls(isMobile);
+    const handleMobileCheck = () => {
+      const isMobile = window.innerWidth <= 700;
+      setShowMobileControls(isMobile);
+    };
+
+    handleMobileCheck(); // Initial check
+    window.addEventListener('resize', handleMobileCheck);
+    
+    return () => window.removeEventListener('resize', handleMobileCheck);
   }, []);
   // Responsive scaling based on container width, keeping 3:2 aspect ratio
   // Responsive scaling based on container width, keeping 3:2 aspect ratio
@@ -189,6 +196,80 @@ export default function Emulator() {
     }
   }
 `}</style>
+      <style>{`
+  :fullscreen .gba-canvas-container,
+  :-webkit-full-screen .gba-canvas-container {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    background: black !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  :fullscreen .controls-container,
+  :fullscreen .title-container,
+  :fullscreen .tips-container,
+  :-webkit-full-screen .controls-container,
+  :-webkit-full-screen .title-container,
+  :-webkit-full-screen .tips-container {
+    display: none !important;
+  }
+
+  /* Keep mobile controls visible in fullscreen on mobile */
+  @media (max-width: 700px) {
+    :fullscreen .mobile-controls,
+    :-webkit-full-screen .mobile-controls {
+      display: flex !important;
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 9999 !important;
+      background: rgba(0, 0, 0, 0.5) !important;
+      padding: 10px !important;
+    }
+  }
+`}</style>
+
+      {/* Update the fullscreen styles */}
+      <style>{`
+  :fullscreen .gba-canvas-container,
+  :-webkit-full-screen .gba-canvas-container {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    background: black !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  :fullscreen .controls-container,
+  :fullscreen .title-container,
+  :fullscreen .tips-container,
+  :-webkit-full-screen .controls-container,
+  :-webkit-full-screen .title-container,
+  :-webkit-full-screen .tips-container {
+    display: none !important;
+  }
+
+  /* Mobile Controls in Fullscreen */
+  @media (max-width: 700px) {
+    :fullscreen .mobile-controls,
+    :-webkit-full-screen .mobile-controls {
+      display: flex !important;
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 9999 !important;
+      background: rgba(0, 0, 0, 0.5) !important;
+      padding: 10px !important;
+      pointer-events: auto !important;
+      touch-action: auto !important;
+    }
+  }
+`}</style>
 
       <h2
         style={{
@@ -283,7 +364,11 @@ export default function Emulator() {
         </div>
 
         {/* Mobile Controls below emulator */}
-        {showMobileControls && <MobileControls />}
+        {(showMobileControls || (isFullscreen && window.innerWidth <= 700)) && (
+          <div className="mobile-controls">
+            <MobileControls />
+          </div>
+        )}
 
         {/* Controls */}
         <div
